@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { pickRandomCard, type LevelType } from '@/lib/cards'
+import { pickRandomCard, getCardsForLevel, type LevelType } from '@/lib/cards'
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,13 +70,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const totalCards = getCardsForLevel(level as LevelType).length
+    
     return NextResponse.json({
       card: {
         id: card.id,
         level: card.level,
         imageFile: card.imageFile,
       },
-      remainingCards: 20 - updatedUsedCards[level].length,
+      remainingCards: totalCards - updatedUsedCards[level].length,
     })
   } catch (err) {
     console.log('[v0] Draw card error:', err)

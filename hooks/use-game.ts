@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { LevelType } from '@/lib/cards'
+import { getCardsForLevel } from '@/lib/cards'
 
 export interface GameRoom {
   id: string
@@ -215,7 +216,8 @@ export function useGame(roomId: string | null) {
     updateGameRoom,
     getRemainingCards: (level: LevelType) => {
       if (!room) return 0
-      return 20 - (room.used_cards[level]?.length || 0)
+      const totalCards = getCardsForLevel(level).length
+      return totalCards - (room.used_cards[level]?.length || 0)
     },
   }
 }
