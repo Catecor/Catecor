@@ -20,25 +20,25 @@ export const LEVEL_LABELS: Record<LevelType, string> = {
 // Card definitions for each level
 // These are placeholder IDs - they'll be used to track which cards have been drawn
 export const CARDS: Record<LevelType, Card[]> = {
-  '1': Array.from({ length: 20 }, (_, i) => ({
+  '1': Array.from({ length: 42 }, (_, i) => ({
     id: `level1-${i + 1}`,
     level: '1',
-    imageFile: `level-1/card-${String(i + 1).padStart(2, '0')}.png`,
+    imageFile: `level-1/${i + 1}.png`,
   })),
-  '2': Array.from({ length: 20 }, (_, i) => ({
+  '2': Array.from({ length: 31 }, (_, i) => ({
     id: `level2-${i + 1}`,
     level: '2',
-    imageFile: `level-2/card-${String(i + 1).padStart(2, '0')}.png`,
+    imageFile: `level-2/${i + 1}.png`,
   })),
-  '3': Array.from({ length: 20 }, (_, i) => ({
+  '3': Array.from({ length: 17 }, (_, i) => ({
     id: `level3-${i + 1}`,
     level: '3',
-    imageFile: `level-3/card-${String(i + 1).padStart(2, '0')}.png`,
+    imageFile: `level-3/${i + 1}.png`,
   })),
-  chance: Array.from({ length: 20 }, (_, i) => ({
+  chance: Array.from({ length: 30 }, (_, i) => ({
     id: `chance-${i + 1}`,
     level: 'chance',
-    imageFile: `chance/card-${String(i + 1).padStart(2, '0')}.png`,
+    imageFile: `chance/${i + 1}.png`,
   })),
 }
 
