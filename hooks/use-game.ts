@@ -121,7 +121,18 @@ export function useGame(roomId: string | null) {
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setPlayers((prev) => [...prev, payload.new as Player])
+            setPlayers((prev) => {
+              // Check if player already exists to avoid duplicates
+              const exists = prev.some((p) => p.id === (payload.new as Player).id)
+              if (exists) return prev
+              return [...prev, payload.new as Player]
+            })
+          } else if (payload.eventType === 'UPDATE') {
+            setPlayers((prev) =>
+              prev.map((p) =>
+                p.id === (payload.new as Player).id ? (payload.new as Player) : p
+              )
+            )
           } else if (payload.eventType === 'DELETE') {
             setPlayers((prev) =>
               prev.filter((p) => p.id !== (payload.old as Player).id)

@@ -28,8 +28,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Alternate teams
-    const nextTeam = room.active_team === 'A' ? 'B' : 'A'
+    // Check if player already exists in this room
+    const { data: existingPlayer } = await supabase
+      .from('players')
+      .select()
+      .eq('room_id', room.id)
+      .eq('player_id', playerId)
+      .maybeSingle()
+
+    if (existingPlayer) {
+      // Player is reconnecting - just return their existing data
+      return NextResponse.json({
+        roomId: room.id,
+        team: existingPlayer.team,
+      })
+    }
+
+    // Get all players to determine team assignment
+    const { data: allPlayers } = await supabase
+      .from('players')
+      .select('team')
+      .eq('room_id', room.id)
+
+    // Count players in each team
+    const teamACounts = allPlayers?.filter((p) => p.team === 'A').length || 0
+    const teamBCounts = allPlayers?.filter((p) => p.team === 'B').length || 0
+    
+    // Assign to team with fewer players
+    const assignedTeam = teamACounts <= teamBCounts ? 'A' : 'B'
 
     // Add player
     const { error: playerError } = await supabase
@@ -38,7 +64,7 @@ export async function POST(request: NextRequest) {
         room_id: room.id,
         player_name: playerName,
         player_id: playerId,
-        team: nextTeam,
+        team: assignedTeam,
         is_host: false,
       })
 
@@ -52,7 +78,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       roomId: room.id,
-      team: nextTeam,
+      team: assignedTeam,
     })
   } catch (err) {
     console.log('[v0] Join API error:', err)

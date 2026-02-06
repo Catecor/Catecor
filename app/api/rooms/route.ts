@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Add host as first player
-    const { error: playerError } = await supabase
+    const { data: playerData, error: playerError } = await supabase
       .from('players')
       .insert({
         room_id: room.id,
@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
         team: 'A',
         is_host: true,
       })
+      .select()
 
     if (playerError) {
       console.log('[v0] Player creation error:', playerError.message, playerError.details)
