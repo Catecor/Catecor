@@ -95,12 +95,14 @@ export function useGame(roomId: string | null) {
 
     const fetchPlayers = async () => {
       try {
+        console.log('[v0] Fetching players for room:', roomId)
         const { data, error } = await supabaseRef.current
           .from('players')
           .select()
           .eq('room_id', roomId)
 
         if (error) throw error
+        console.log('[v0] Fetched players:', data?.length, 'players', data)
         setPlayers(data || [])
       } catch (err) {
         console.log('[v0] Fetch players error:', err)
@@ -120,27 +122,38 @@ export function useGame(roomId: string | null) {
           filter: `room_id=eq.${roomId}`,
         },
         (payload) => {
+          console.log('[v0] Player subscription event:', payload.eventType, payload)
           if (payload.eventType === 'INSERT') {
+            const newPlayer = payload.new as Player
+            console.log('[v0] New player joined:', newPlayer.player_name, newPlayer.id)
             setPlayers((prev) => {
               // Check if player already exists to avoid duplicates
-              const exists = prev.some((p) => p.id === (payload.new as Player).id)
-              if (exists) return prev
-              return [...prev, payload.new as Player]
+              const exists = prev.some((p) => p.id === newPlayer.id)
+              if (exists) {
+                console.log('[v0] Player already exists, skipping duplicate')
+                return prev
+              }
+              console.log('[v0] Adding player to list. Total players:', prev.length + 1)
+              return [...prev, newPlayer]
             })
           } else if (payload.eventType === 'UPDATE') {
+            console.log('[v0] Player updated:', (payload.new as Player).id)
             setPlayers((prev) =>
               prev.map((p) =>
                 p.id === (payload.new as Player).id ? (payload.new as Player) : p
               )
             )
           } else if (payload.eventType === 'DELETE') {
+            console.log('[v0] Player removed:', (payload.old as Player).id)
             setPlayers((prev) =>
               prev.filter((p) => p.id !== (payload.old as Player).id)
             )
           }
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log('[v0] Player subscription status:', status)
+      })
 
     return () => {
       subscription.unsubscribe()

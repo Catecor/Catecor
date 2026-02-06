@@ -17,10 +17,14 @@ export function Lobby({
   const [editingTeam, setEditingTeam] = useState<'A' | 'B' | null>(null)
   const [editValue, setEditValue] = useState('')
 
+  console.log('[v0] Lobby rendered. Total players:', players.length, players)
+
   const isHost = room?.host_id === localStorage.getItem('card_party_player_id')
   const teamAPlayers = players.filter((p) => p.team === 'A')
   const teamBPlayers = players.filter((p) => p.team === 'B')
-  const minPlayers = 2
+  
+  console.log('[v0] Team A:', teamAPlayers.length, 'Team B:', teamBPlayers.length)
+  const minPlayers = 0 // Allow game to start with any number of players
 
   const handleUpdateTeamName = async (team: 'A' | 'B') => {
     if (editValue.trim()) {
@@ -212,17 +216,14 @@ export function Lobby({
             <div>
               <h3 className="text-lg font-bold text-white mb-2">Game Ready?</h3>
               <p className="text-slate-400">
-                {players.length >= minPlayers
-                  ? `✓ All set! You have ${players.length} players`
-                  : `Need ${minPlayers - players.length} more player${minPlayers - players.length !== 1 ? 's' : ''}`}
+                ✓ Ready to start with {players.length} player{players.length !== 1 ? 's' : ''}
               </p>
             </div>
 
             {isHost && (
               <Button
                 onClick={handleStartGame}
-                disabled={players.length < minPlayers}
-                className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 px-8 h-12 text-lg"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 h-12 text-lg"
               >
                 Start Game
               </Button>
