@@ -88,6 +88,12 @@ export function GameWrapper() {
     setView('game')
   }
 
+  const handleLeaveGame = () => {
+    setRoomId(null)
+    setPlayerName('')
+    setView('home')
+  }
+
   return (
     <>
       {view === 'home' && (
@@ -99,7 +105,7 @@ export function GameWrapper() {
       )}
 
       {view === 'game' && roomId && (
-        <GameBoard roomId={roomId} />
+        <GameBoard roomId={roomId} onLeaveGame={handleLeaveGame} />
       )}
     </>
   )

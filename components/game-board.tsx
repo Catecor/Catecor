@@ -16,7 +16,7 @@ const LEVELS: Array<{ id: LevelType; label: string }> = [
   { id: 'chance', label: 'CHANCE' },
 ]
 
-export function GameBoard({ roomId }: { roomId: string }) {
+export function GameBoard({ roomId, onLeaveGame }: { roomId: string; onLeaveGame?: () => void }) {
   const { room, players, drawCard, getRemainingCards, updateGameRoom } = useGame(roomId)
   const [selectedCard, setSelectedCard] = useState<{
     imageFile: string
@@ -39,6 +39,22 @@ export function GameBoard({ roomId }: { roomId: string }) {
       }
     } finally {
       setDrawing(false)
+    }
+  }
+
+  const handleLeaveGame = async () => {
+    const playerId = localStorage.getItem('card_party_player_id')
+    if (!playerId) return
+
+    const success = await updateGameRoom('leave_game', { playerId })
+    if (success) {
+      // Clear local storage
+      localStorage.removeItem('card_party_room_id')
+      localStorage.removeItem('card_party_player_name')
+      // Call parent callback if provided
+      if (onLeaveGame) {
+        onLeaveGame()
+      }
     }
   }
 
@@ -186,6 +202,7 @@ export function GameBoard({ roomId }: { roomId: string }) {
             New Game
           </Button>
           <Button
+            onClick={handleLeaveGame}
             variant="outline"
             className="border-slate-600 text-slate-300 hover:bg-slate-800 bg-transparent"
           >

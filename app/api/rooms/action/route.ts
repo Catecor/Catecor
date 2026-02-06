@@ -69,17 +69,48 @@ export async function POST(request: NextRequest) {
       }
 
       case 'new_game': {
+        console.log('[v0] Starting new game for room:', roomId)
         const { error } = await supabase
           .from('game_rooms')
           .update({
             used_cards: { '1': [], '2': [], '3': [], chance: [] },
+            current_card: null,
+            active_team: 'A',
             game_phase: 'playing',
           })
           .eq('id', roomId)
 
         if (error) {
+          console.log('[v0] New game error:', error)
           return NextResponse.json(
             { error: 'Failed to start new game' },
+            { status: 500 }
+          )
+        }
+        console.log('[v0] New game started successfully - all decks reset')
+        return NextResponse.json({ success: true })
+      }
+
+      case 'leave_game': {
+        const { playerId } = payload || {}
+        
+        if (!playerId) {
+          return NextResponse.json(
+            { error: 'Missing playerId' },
+            { status: 400 }
+          )
+        }
+
+        // Remove player from the room
+        const { error } = await supabase
+          .from('players')
+          .delete()
+          .eq('room_id', roomId)
+          .eq('player_id', playerId)
+
+        if (error) {
+          return NextResponse.json(
+            { error: 'Failed to leave game' },
             { status: 500 }
           )
         }

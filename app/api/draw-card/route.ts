@@ -32,9 +32,11 @@ export async function POST(request: NextRequest) {
 
     // Get used cards for this level
     const usedCards = room.used_cards[level as LevelType] || []
+    console.log('[v0] Drawing card for level:', level, 'Used cards:', usedCards.length)
 
     // Pick random card from available cards
     const card = pickRandomCard(level as LevelType, usedCards)
+    console.log('[v0] Picked card:', card?.id)
 
     if (!card) {
       return NextResponse.json(
